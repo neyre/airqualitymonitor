@@ -9,8 +9,10 @@ from machine import Pin, UART, freq, WDT
 
 freq(80000000) # Underclock to 80MHz to save power, keep things cooler, why not
 
-UPDATE_TIME_INTERVAL = 5000  # in ms 
-last_update = time.ticks_ms() 
+# Configuration
+UPDATE_TIME_INTERVAL = 20*1000  # in ms
+WATCHDOG_TIMEOUT = 120*1000 # in ms
+LOOP_PAUSE = .1 # in s
 
 UART_NUM = 2
 
@@ -55,8 +57,10 @@ def take_measurement():
 
     return {'field1': temp_f, 'field2': hum, 'field3': pm1, 'field4': pm2, 'field5': pm10, 'field6': tvoc, 'field7': eco2, 'field8': aqi}
 
-time.sleep(2) # Initialize
-wdt = WDT(timeout=120000) # 2 Minute watchdog
+# Initialize
+time.sleep(1)
+last_update = time.ticks_ms() - UPDATE_TIME_INTERVAL
+wdt = WDT(timeout=WATCHDOG_TIMEOUT) # 2 Minute watchdog
 wdt.feed()
 
 while True:
@@ -71,3 +75,7 @@ while True:
         print("Could not get and send update")
 
     wdt.feed()
+    time.sleep(LOOP_PAUSE)
+
+    # Print countdown so that serial monitor doesn't fall asleep
+    print(round((UPDATE_TIME_INTERVAL - time.ticks_ms() + last_update)/1000))
