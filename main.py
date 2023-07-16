@@ -5,7 +5,7 @@ import math
 import urequests
 import machine
 import ubinascii
-from machine import Pin, UART, freq
+from machine import Pin, UART, freq, WDT
 
 freq(80000000) # Underclock to 80MHz to save power, keep things cooler, why not
 
@@ -55,12 +55,19 @@ def take_measurement():
 
     return {'field1': temp_f, 'field2': hum, 'field3': pm1, 'field4': pm2, 'field5': pm10, 'field6': tvoc, 'field7': eco2, 'field8': aqi}
 
-time.sleep(2)
+time.sleep(2) # Initialize
+wdt = WDT(timeout=120000) # 2 Minute watchdog
+wdt.feed()
 
-while True: 
-    if time.ticks_ms() - last_update >= UPDATE_TIME_INTERVAL:
-        data = take_measurement()
-        request = urequests.post( 'http://api.thingspeak.com/update?api_key=' + THINGSPEAK_WRITE_API_KEY, json = data, headers = HTTP_HEADERS)
-        request.close()
-        print(data)
-        last_update = time.ticks_ms()
+while True:
+    try:
+        if time.ticks_ms() - last_update >= UPDATE_TIME_INTERVAL:
+            data = take_measurement()
+            request = urequests.post( 'http://api.thingspeak.com/update?api_key=' + THINGSPEAK_WRITE_API_KEY, json = data, headers = HTTP_HEADERS)
+            request.close()
+            print(data)
+            last_update = time.ticks_ms()
+    except Exception as e:
+        print("Could not get and send update")
+
+    wdt.feed()
