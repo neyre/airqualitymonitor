@@ -10,6 +10,10 @@ A air quality sensor.
 - [Getting started guide with esp32 and micropython](https://docs.micropython.org/en/latest/esp32/tutorial/intro.html#esp32-intro)
 - [Firmware downloads](https://micropython.org/download/esp32/) - this is using version esp32-20220618-v1.19.1.bin
 
+# To Do
+
+- [ ] Add error handling on wifi connection (right now it crashes if desired wifi isn't available.)
+
 # Misc. Notes
 
 ### Opportunities for performance improvement

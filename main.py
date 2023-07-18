@@ -15,6 +15,7 @@ WATCHDOG_TIMEOUT = 120*1000 # in ms
 LOOP_PAUSE = .1 # in s
 
 UART_NUM = 2
+SLEEP_PIN_NUM = 21
 
 WIFI_SSID = 'redacted'
 WIFI_PASS = 'redacted'
@@ -38,6 +39,10 @@ print(uart)
 APC_CMD_READ = ubinascii.unhexlify('424DE200000171')
 APC_CMD_SENSORINFO = ubinascii.unhexlify('424DE900000178')
 HTTP_HEADERS = {'Content-Type': 'application/json'} 
+
+# Configure sleep pin & set in wake mode
+apc_sleep = machine.Pin(SLEEP_PIN_NUM, machine.Pin.OUT)
+apc_sleep.value(1) # 0 = SLEEP, 1 = WAKE
 
 def take_measurement():
     print('Taking Measurement...')
